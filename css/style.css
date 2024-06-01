@@ -838,6 +838,65 @@ ul.email li i {
 }
 /** end register section **/
 
+/** login section **/
+
+.login_form .user_login {
+     border: #404b65 solid 1px;
+     padding: 0 15px;
+     margin-bottom: 25px;
+     width: 100%;
+     height: 79px;
+     background: transparent;
+     color: #5e687d;
+     font-size: 16px;
+     font-weight: normal;
+}
+
+.login_form .textarea {
+     border: #404b65 solid 1px;
+     padding: 0 15px;
+     margin-bottom: 25px;
+     width: 100%;
+     height: 79px;
+     background: transparent;
+     color: #5e687d;
+     font-size: 16px;
+     font-weight: normal;
+     padding-top: 23px;
+}
+
+.login_form .login_btn {
+     font-size: 20px;
+     transition: ease-in all 0.5s;
+     background-color: transparent;
+     text-transform: uppercase;
+     color: #fff;
+     padding: 12px 0px;
+     max-width: 202px;
+     width: 100%;
+     display: block;
+     margin-top: 10px !important;
+     font-weight: 500;
+     margin: 0 auto;
+     border-radius: 30px;
+     border: #fff solid 2px;
+}
+
+.login_form .login_btn:hover {
+     background-color: #face34;
+     transition: ease-in all 0.5s;
+     color: #fff;
+     border: #face34 solid 2px;
+}
+
+#request *::placeholder {
+     color: #5e687d;
+     opacity: 1;
+}
+
+/** end login section **/
+
+
 /** footer **/
 
 .footer {
