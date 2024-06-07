@@ -1,4 +1,3 @@
-// Additional function for initializing database schema
 const { Pool } = require('pg');
 require('dotenv').config();
 
@@ -12,7 +11,8 @@ const pool = new Pool({
 
 module.exports = pool;
 
-
+// Account management
+// Additional function for initializing database schema
 const initDB = async () => {
     const client = await pool.connect();
     try {
