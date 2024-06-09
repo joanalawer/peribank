@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const argon2 = require('argon2');
 const pool = require('../db');
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.post('/register', async (req, res) => {
   const { username, password, email } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password, 10);
     const newUser = await pool.query(
       'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *',
       [username, hashedPassword, email]
@@ -31,7 +31,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'User not found' });
     }
 
-    const validPassword = await bcrypt.compare(password, user.rows[0].password);
+    const validPassword = await argon2.verify(password, user.rows[0].password);
 
     if (!validPassword) {
       return res.status(400).json({ message: 'Incorrect password' });
