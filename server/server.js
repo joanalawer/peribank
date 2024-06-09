@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+// const { initBD } = require('./db');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 dotenv.config();
 app.use(bodyParser.json());
@@ -20,7 +21,7 @@ app.use('/api', userRoutes);
 app.use('/api', accountRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/pages/index.html');
+  res.sendFile(__dirname + '/index.html');
 });
 
 app.listen(port, () => {
