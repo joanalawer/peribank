@@ -1,4 +1,6 @@
 // server.js
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
@@ -9,10 +11,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // PostgreSQL connection setup
 const pool = new Pool({
-    user: 'userdb',
+    user: 'postgres',
     host: 'localhost',
-    database: 'your_db_name',
-    password: 'your_db_password',
+    database: 'userdb',
+    // password: 'admin',
     port: 5432,
 });
 
