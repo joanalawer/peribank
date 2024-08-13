@@ -102,7 +102,7 @@
                             <div class="titlepage text_align_left">
                               <h2>Customer Login</h2>
                             </div>
-                            <form id="request" class="login_form">
+                            <form action="/login" method="POST" onsubmit="return validateForm" id="request" class="login_form">
                               <div class="row">
                                   <div class="col-md-6">
                                       <input class="user_login" placeholder="Username" type="type" id="username" name="username">
