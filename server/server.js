@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const app = express();
 
-app.use (express.static('pages'));
+app.use(express.static('pages'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
