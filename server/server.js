@@ -12,19 +12,58 @@ app.use(express.static('pages'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// PostgreSQL connection setup
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'userdb',
-    // password: 'admin',
-    port: 5432,
-});
+const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-    res.render("index");
+// // PostgreSQL connection setup
+// const pool = new Pool({
+//     user: 'postgres',
+//     host: 'localhost',
+//     database: 'userdb',
+//     // password: 'admin',
+//     port: 5432,
+// });
+
+app.get('/', (req, res) => {
+    res.render('index');
   });
 
+app.get('/register', (req, res) => {
+    res.render('register');
+});
+
+app.get('login', (req, res) => {
+    res.render('login');
+});
+
+app.get('/profile', (req, res) => {
+    res.render('profile');
+});
+
+app.get('/balance', (req, res) => {
+    res.render('balance');
+});
+
+app.get('/deposit', (req, res) => {
+    res.render('deposit');
+});
+
+app.get('/withdraw', (req, res) => {
+    res.render('withdraw');
+});
+
+app.get('/transfer', (req, res) => {
+    res.render('transfer');
+});
+
+app.get('/close_account', (req, res) => {
+    res.render('close_account');
+});
+
+app.get('/logout', (req, res) => {
+    res.render('index');
+});
+
+  
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
