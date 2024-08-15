@@ -5,7 +5,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 const app = express();
+
+app.use (express.static('pages'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -17,6 +20,10 @@ const pool = new Pool({
     // password: 'admin',
     port: 5432,
 });
+
+app.get("/", (req, res) => {
+    res.render("index");
+  });
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
