@@ -27,6 +27,22 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
 });
 
+app.get('/index', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
+});
+
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'about.html'));  // Serve the HTML file
+});
+
+app.get('/services', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'services.html'));  // Serve the HTML file
+});
+
+app.get('/contact', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'contact.html'));  // Serve the HTML file
+});
+
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'register.html'));  // Serve the HTML file
 });
