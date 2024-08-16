@@ -84,6 +84,7 @@
                                     <h2>New Account</h2>
                                 </div>
                             </div>
+                            <div id="error-messages"></div>
                             <div class="col-md-10 offset-md-1">
                                 <form action="/register" method="POST" id="request" class="register_form">
                                     <!-- <h2>Personal Details</h2> -->
@@ -193,6 +194,31 @@
     </footer>
     <!-- end footer -->
     <!-- Javascript files-->
+    <script>
+        // Function to get query parameters from the URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            let errors = [];
+            for (const [key, value] of params.entries()) {
+                if (key === 'message') {
+                    errors.push(value);
+                }
+            }
+            return errors;
+        }
+
+        // Display errors if any
+        const errors = getQueryParams();
+        if (errors.length > 0) {
+            const errorContainer = document.getElementById('error-messages');
+            errors.forEach(message => {
+                const errorElement = document.createElement('p');
+                errorElement.className = 'error';
+                errorElement.textContent = message;
+                errorContainer.appendChild(errorElement);
+            });
+        }
+    </script>
       <script src="../js/jquery.min.js"></script>
       <script src="../js/bootstrap.bundle.min.js"></script>
       <script src="../js/jquery-3.0.0.min.js"></script>
