@@ -1,14 +1,13 @@
-// server.js
-require('dotenv').config();
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+const path = require('path');
 const app = express();
 
-app.use(express.static('pages'));
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'pages')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -23,6 +22,10 @@ const PORT = process.env.PORT || 3000;
 //     port: 5432,
 // });
 
+// Define routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
+});
 app.get('/', (req, res) => {
     res.render('index');
   });
