@@ -8,6 +8,7 @@ const app = express();
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'pages')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -76,7 +77,7 @@ app.get('/close_account', (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-    res.render('index');
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
 });
 
   
