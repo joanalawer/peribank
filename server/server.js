@@ -26,40 +26,37 @@ const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
 });
-app.get('/', (req, res) => {
-    res.render('index');
-  });
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    res.sendFile(path.join(__dirname, 'pages', 'register.html'));  // Serve the HTML file
 });
 
-app.get('login', (req, res) => {
-    res.render('login');
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages', 'login.html'));  // Serve the HTML file
 });
 
 app.get('/profile', (req, res) => {
-    res.render('profile');
+    res.sendFile(path.join(__dirname, 'pages', 'profile.html'));  // Serve the HTML file
 });
 
 app.get('/balance', (req, res) => {
-    res.render('balance');
+    res.sendFile(path.join(__dirname, 'pages', 'balance.html'));  // Serve the HTML file
 });
 
 app.get('/deposit', (req, res) => {
-    res.render('deposit');
+    res.sendFile(path.join(__dirname, 'pages', 'deposit.html'));  // Serve the HTML file
 });
 
 app.get('/withdraw', (req, res) => {
-    res.render('withdraw');
+    res.sendFile(path.join(__dirname, 'pages', 'withdraw.html'));  // Serve the HTML file
 });
 
 app.get('/transfer', (req, res) => {
-    res.render('transfer');
+    res.sendFile(path.join(__dirname, 'pages', 'transfer.html'));  // Serve the HTML file
 });
 
 app.get('/close_account', (req, res) => {
-    res.render('close_account');
+    res.sendFile(path.join(__dirname, 'pages', 'close_account.html'));  // Serve the HTML file
 });
 
 app.get('/logout', (req, res) => {
