@@ -73,7 +73,7 @@ app.get('/logout', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
 });
 
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
     let { username, email, password, password2 } = req.body;
     console.log({
         username, email, password, password2
@@ -92,7 +92,30 @@ app.post('/register', (req, res) => {
     if (errors.length > 0) {
         // Convert errors to a string and pass it as a query parameter
         const query = errors.map(err => `message=${encodeURIComponent(err.message)}`).join('&');
-        res.redirect(`/register?${query}`);}
+        res.redirect(`/register?${query}`);
+    }else{
+        // Form validation passed
+
+        let hashedPassword = await bcrypt.hash(password, 10);
+        console.log(hashedPassword);
+
+        pool.query(
+            `SELECT * FROM users
+              WHERE email = $1`,
+            [email],
+            (err, results) => {
+              if (err) {
+                throw err;
+              }
+              console.log(results.rows);
+      
+              if (results.rows.length > 0) {
+                errors.push({message: 'Email already exist'})
+                res.sendFile(path.join(__dirname, 'pages', 'register.html', { errors }));
+              }
+            }
+        );
+    }
 });
   
 // app.post('/login', async (req, res) => {
