@@ -94,8 +94,7 @@ app.post('/register', async (req, res) => {
         const query = errors.map(err => `message=${encodeURIComponent(err.message)}`).join('&');
         res.redirect(`/register?${query}`);
     }else{
-        // Form validation passed
-
+        // Hash password
         let hashedPassword = await bcrypt.hash(password, 10);
         console.log(hashedPassword);
 
@@ -105,13 +104,13 @@ app.post('/register', async (req, res) => {
             [email],
             (err, results) => {
               if (err) {
-                throw err;
+                console.error(err.message);
+                return res.status(500).send('Server error');
               }
               console.log(results.rows);
       
               if (results.rows.length > 0) {
-                errors.push({message: 'Email already exist'})
-                res.sendFile(path.join(__dirname, 'pages', 'register.html', { errors }));
+                return res.redirect('/register?message=Email+already+exists');
               }
             }
         );
