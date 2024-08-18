@@ -542,9 +542,27 @@ ul.email li i {
 .about_img figure {
      margin: 0;
 }
-
-
 /** end about **/
+
+/* services */
+.service_title {
+     padding-bottom: 60px;
+}
+
+.service_title h2 {
+     font-size: 45px;
+     font-weight: 600;
+     line-height: 55px;
+}
+
+.services_button {
+     margin-top: 10px;
+     float: right;
+     max-width: 554px;
+     width: 100%;
+     text-align: left;
+}
+/* end services */
 
 .titlepage {
      padding-bottom: 60px;
