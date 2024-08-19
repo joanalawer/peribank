@@ -22,55 +22,55 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'about.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'about.html'));
 });
 
 app.get('/services', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'services.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'services.html'));
 });
 
 app.get('/contact', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'contact.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'contact.html'));
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'register.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'register.html'));
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'login.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'login.html'));
 });
 
 app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'profile.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'profile.html'));
 });
 
 app.get('/balance', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'balance.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'balance.html'));
 });
 
 app.get('/deposit', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'deposit.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'deposit.html'));
 });
 
 app.get('/withdraw', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'withdraw.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'withdraw.html'));
 });
 
 app.get('/transfer', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'transfer.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'transfer.html'));
 });
 
 app.get('/close_account', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'close_account.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'close_account.html'));
 });
 
 app.get('/logout', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
 });
 
 app.post('/register', async (req, res) => {
