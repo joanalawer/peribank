@@ -499,8 +499,6 @@ ul.email li i {
      color: #fff;
      transition: ease-in all 0.5s;
 }
-
-
 /** end wallet **/
 
 
@@ -565,7 +563,7 @@ ul.email li i {
 /* end services */
 
 .titlepage {
-     padding-bottom: 60px;
+     padding-bottom: 50px;
 }
 
 .titlepage h2 {
@@ -908,7 +906,19 @@ ul.email li i {
      color: #5e687d;
      opacity: 1;
 }
+.register_que {
+     color: #fff;
+     margin: 0 auto;
+     padding: 12px 0px;
+     font-size: 15px;
+     display: block;
+     max-width: 350px;
+     margin-top: 30px !important;
+}
 
+.register_que:hover {
+     color: #face34;
+}
 /** end register section **/
 
 /** login section **/
@@ -965,6 +975,19 @@ ul.email li i {
 #request *::placeholder {
      color: #5e687d;
      opacity: 1;
+}
+.login_que {
+     color: #fff;
+     margin: 0 auto;
+     padding: 12px 0px;
+     font-size: 15px;
+     display: block;
+     max-width: 350px;
+     margin-top: 10px !important;
+}
+
+.login_que:hover {
+     color: #face34;
 }
 /** end login section **/
 
