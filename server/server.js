@@ -35,8 +35,8 @@ app.use(flash());
 
 // Middleware to make flash messages available in templates
 app.use ((req, res, next) => {
-    res.locals.successMessage = req.flash('success-message');
-    res.locals.errorMessage = req.flash('error-message');
+    res.locals.successMessage = req.flash('successMessage');
+    res.locals.errorMessage = req.flash('errorMessage');
     next();
 });
 
@@ -114,7 +114,7 @@ app.post('/register', async (req, res) => {
     }
     if (errors.length > 0) {
         // Render the register page with error messages
-        req.flash('error-message', errors.map(err => err.message).join(', '));
+        req.flash('errorMessage', errors.map(err => err.message).join(', '));
         return res.redirect('/register');
     }
     else {
@@ -123,7 +123,7 @@ app.post('/register', async (req, res) => {
             pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
 
             if (results.rows.length > 0) {
-                req.flash('error-message', 'Email already exists!');
+                req.flash('errorMessage', 'Email already exists!');
                 return res.redirect('/register');
             }
 
@@ -136,11 +136,11 @@ app.post('/register', async (req, res) => {
             [username, email, hashedPassword]
          );
             
-            req.flash('success-message', 'Registration Successful! Please Login');
+            req.flash('successMessage', 'Registration Successful! Please Login');
             res.redirect('/login');
         } catch (err) {
             console.error(err.message);
-            req.flash('error-message', 'Server error. Please try again later.');
+            req.flash('errorMessage', 'Server error. Please try again later.');
             res.redirect('/register');
         }
     }

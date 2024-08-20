@@ -85,9 +85,9 @@
                                 </div>
                             </div>
                             <!-- Error Messages -->
-                            <% if (error-message && error-message.length > 0) { %>
+                            <% if (errorMessage && errorMessage.length > 0) { %>
                                 <ul class="error-list">
-                                    <% error-message.forEach(function(error) { %>
+                                    <% errorMessage.forEach(function(error) { %>
                                         <li><%= error.message %></li>
                                     <% }); %>
                                 </ul>
