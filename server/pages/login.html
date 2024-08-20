@@ -100,14 +100,13 @@
                             <div class="titlepage text_align_left">
                               <h2>Customer Login</h2>
                             </div>
-                            <div id="success-messages"></div>
                             <form action="/login" method="POST" id="request" class="login_form">
                               <div class="row">
                                   <div class="col-md-6">
-                                      <input class="user_login" placeholder="Username" type="text" id="username" name="username">
+                                      <input class="user_login" placeholder="Email" type="email" id="email" name="email" required>
                                   </div>
                                   <div class="col-md-6">
-                                      <input class="user_login" placeholder="Password" type="password" id="password" name="Password">
+                                      <input class="user_login" placeholder="Password" type="password" id="password" name="password" required>
                                   </div>
                                   <div class="col-md-12">
                                       <button class="login_btn">Login</button>
