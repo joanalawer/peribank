@@ -44,59 +44,59 @@ const PORT = process.env.PORT || 3000;
 
 // Define routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));  // Serve the HTML file
+    res.render('index');
 });
 
 app.get('/index', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
+    res.render('index');
 });
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'about.html'));
+    res.render('about');
 });
 
 app.get('/services', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'services.html'));
+    res.render('services');
 });
 
 app.get('/contact', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'contact.html'));
+    res.render('contact');
 });
 
 app.get('/register', (req, res) => {
-    res.render(path.join(__dirname, 'pages', 'register.html'));
+    res.render('register');
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'login.html'));
+    res.render('login');
 });
 
 app.get('/profile', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'profile.html'));
+    res.render('profile');
 });
 
 app.get('/balance', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'balance.html'));
+    res.render('balance');
 });
 
 app.get('/deposit', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'deposit.html'));
+    res.render('deposit');
 });
 
 app.get('/withdraw', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'withdraw.html'));
+    res.render('withdraw');
 });
 
 app.get('/transfer', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'transfer.html'));
+    res.render('transfer');
 });
 
 app.get('/close_account', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'close_account.html'));
+    res.render('close_account');
 });
 
 app.get('/logout', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
+    res.render('index');
 });
 
 app.post('/register', async (req, res) => {
