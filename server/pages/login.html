@@ -100,7 +100,8 @@
                             <div class="titlepage text_align_left">
                               <h2>Customer Login</h2>
                             </div>
-                            <form action="/login" method="POST" onsubmit="return validateForm();" id="request" class="login_form">
+                            <div id="success-messages"></div>
+                            <form action="/login" method="POST" id="request" class="login_form">
                               <div class="row">
                                   <div class="col-md-6">
                                       <input class="user_login" placeholder="Username" type="text" id="username" name="username">
