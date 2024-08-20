@@ -1,16 +1,19 @@
+const express = require('express');
 const path = require('path');
+const app = express();
 const { pool } = require('./db');
 const bcrypt = require('bcrypt');
-const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
 require('dotenv').config();
-const app = express();
 
 
-// Middle ware to serve pages and static files from the "public" directory
+// Middleware to serve pages and static files from the "public" directory
+app.engine('.html', require('ejs').__express);
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.set('view engine', 'html');
 
 app.use(express.urlencoded({ extended: false }));
 
