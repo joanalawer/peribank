@@ -8,12 +8,18 @@ const flash = require('connect-flash');
 require('dotenv').config();
 
 
-// Middleware to serve pages and static files from the "public" directory
+// Set EJS as the templating engine for .html files
 app.engine('.html', require('ejs').__express);
-app.use(express.static(path.join(__dirname, 'pages')));
+app.set('view engine', 'html');
+
+// Set the views directory to /pages
+app.set('views', path.join(__dirname, 'pages'));
+
+// Serve static files from /public directory
+// app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.set('view engine', 'html');
+
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -23,12 +29,14 @@ app.use(session({
     saveUninitialized: true
     // cookie: { secure: false }
 }));
+
 // Initialise flash middleware
 app.use(flash());
+
 // Middleware to make flash messages available in templates
 app.use ((req, res, next) => {
     res.locals.successMessage = req.flash('success-message');
-    res.locals.errorMesage = req.flash('error-message');
+    res.locals.errorMessage = req.flash('error-message');
     next();
 });
 
@@ -56,7 +64,7 @@ app.get('/contact', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'register.html'));
+    res.render(path.join(__dirname, 'pages', 'register.html'));
 });
 
 app.get('/login', (req, res) => {
@@ -105,21 +113,23 @@ app.post('/register', async (req, res) => {
         errors.push({ message: 'Passwords do not match'});
     }
     if (errors.length > 0) {
-        req.flash('error-message', errors);
+        // Render the register page with error messages
+        req.flash('error-message', errors.map(err => err.message).join(', '));
         return res.redirect('/register');
     }
     else {
         try {
-        // Hash password
-            let hashedPassword = await bcrypt.hash(password, 10);
-            pool.query(
-                `SELECT * FROM users WHERE email = $1`,
-                [email]
-            );
+        // Check if email already exists
+            pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
             if (results.rows.length > 0) {
-            req.flash('error-message', 'Email already exists!');
-            return res.redirect('/register');
+                req.flash('error-message', 'Email already exists!');
+                return res.redirect('/register');
             }
+
+            // Hass password
+            let hashedPassword = await bcrypt.hash(password, 10);
+
             // Insert new user into the database
             pool.query(
             'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
@@ -130,7 +140,7 @@ app.post('/register', async (req, res) => {
             res.redirect('/login');
         } catch (err) {
             console.error(err.message);
-            req.flash('error', 'Server error. Please try again later.');
+            req.flash('error-message', 'Server error. Please try again later.');
             res.redirect('/register');
         }
     }

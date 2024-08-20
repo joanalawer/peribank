@@ -84,7 +84,14 @@
                                     <h2>New Account</h2>
                                 </div>
                             </div>
-                            <div id="error-messages"></div>
+                            <!-- Error Messages -->
+                            <% if (error-message && error-message.length > 0) { %>
+                                <ul class="error-list">
+                                    <% error-message.forEach(function(error) { %>
+                                        <li><%= error.message %></li>
+                                    <% }); %>
+                                </ul>
+                            <% } %>
                             <div class="col-md-10 offset-md-1">
                                 <form action="/register" method="POST" id="request" class="register_form">
                                     <!-- <h2>Personal Details</h2> -->
@@ -194,6 +201,5 @@
       <script src="../js/bootstrap.bundle.min.js"></script>
       <script src="../js/jquery-3.0.0.min.js"></script>
       <script src="../js/custom.js"></script>
-      <script src="../js/app.js"></script>
    </body>
 </html>
