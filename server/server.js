@@ -1,18 +1,33 @@
-const express = require('express');
-const app = express();
-// const bodyParser = require('body-parser');
-// const { Pool } = require('pg');
+const path = require('path');
 const { pool } = require('./db');
 const bcrypt = require('bcrypt');
+const express = require('express');
+const session = require('express-session');
+const flash = require('connect-flash');
 require('dotenv').config();
-const path = require('path');
+const app = express();
 
 
-// Serve static files from the "public" directory
+// Middle ware to serve pages and static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.urlencoded({ extended: false }));
+
+app.use(session({
+    secret: 'secret_key',
+    resave: false,
+    saveUninitialized: true
+    // cookie: { secure: false }
+}));
+// Initialise flash middleware
+app.use(flash());
+// Middleware to make flash messages available in templates
+app.use ((req, res, next) => {
+    res.locals.successMessage = req.flash('success-message');
+    res.locals.errorMesage = req.flash('error-message');
+    next();
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -75,9 +90,6 @@ app.get('/logout', (req, res) => {
 
 app.post('/register', async (req, res) => {
     let { username, email, password, password2 } = req.body;
-    console.log({
-        username, email, password, password2
-    });
 
     let errors = [];
     if (!username || !email || !password || !password2) {
@@ -90,30 +102,34 @@ app.post('/register', async (req, res) => {
         errors.push({ message: 'Passwords do not match'});
     }
     if (errors.length > 0) {
-        // Convert errors to a string and pass it as a query parameter
-        const query = errors.map(err => `message=${encodeURIComponent(err.message)}`).join('&');
-        res.redirect(`/register?${query}`);
-    }else{
+        req.flash('error-message', errors);
+        return res.redirect('/register');
+    }
+    else {
+        try {
         // Hash password
-        let hashedPassword = await bcrypt.hash(password, 10);
-        console.log(hashedPassword);
-
-        pool.query(
-            `SELECT * FROM users
-              WHERE email = $1`,
-            [email],
-            (err, results) => {
-              if (err) {
-                console.error(err.message);
-                return res.status(500).send('Server error');
-              }
-              console.log(results.rows);
-      
-              if (results.rows.length > 0) {
-                return res.redirect('/register?message=Email+already+exists');
-              }
+            let hashedPassword = await bcrypt.hash(password, 10);
+            pool.query(
+                `SELECT * FROM users WHERE email = $1`,
+                [email]
+            );
+            if (results.rows.length > 0) {
+            req.flash('error-message', 'Email already exists!');
+            return res.redirect('/register');
             }
-        );
+            // Insert new user into the database
+            pool.query(
+            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+            [username, email, hashedPassword]
+         );
+            
+            req.flash('success-message', 'Registration Successful! Please Login');
+            res.redirect('/login');
+        } catch (err) {
+            console.error(err.message);
+            req.flash('error', 'Server error. Please try again later.');
+            res.redirect('/register');
+        }
     }
 });
   
