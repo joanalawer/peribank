@@ -71,7 +71,12 @@
         </div>
     </header>
     <!-- end header -->
-
+    <!-- Success Messages -->
+    <% if (successMessage) { %>
+    <div class="alerts">
+        <%= successMessage %>
+    </div>
+    <% } %>
     <!-- wallet -->
     <div class="wallet">
         <div class="container-fluid">
