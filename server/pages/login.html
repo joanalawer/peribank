@@ -100,6 +100,12 @@
                             <div class="titlepage text_align_left">
                               <h2>Customer Login</h2>
                             </div>
+                            <!-- Success Messages -->
+                            <% if (successMessage) { %>
+                                <div class="alert alert-success">
+                                    <%= successMessage %>
+                                </div>
+                            <% } %>
                             <form action="/login" method="POST" id="request" class="login_form">
                               <div class="row">
                                   <div class="col-md-6">
