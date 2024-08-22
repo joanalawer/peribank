@@ -127,13 +127,13 @@ app.post('/register', async (req, res) => {
                 return res.redirect('/register');
             }
 
-            // Hass password
+            // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
 
             // Insert new user into the database
             await pool.query(
             'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
-            [username, email, password]
+            [username, email, hashedPassword]
          );
             
             req.flash('successMessage', 'Registration Successful! Please Login');
