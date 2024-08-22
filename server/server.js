@@ -172,15 +172,13 @@ app.post('/login', async (req, res) => {
 
         // If valid, store user data in the session and redirect to the dashboard
         // req.session.user = user;
+        req.flash('successMessage', 'Welcome to your dashboard!');
         res.redirect('/profile');
+    
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error. Please try again later.');
     }
-});
-
-app.get('/profile', (req, res) => {
-    res.send('Welcome to your dashboard!');
 });
 
 app.listen(3000, () => {
