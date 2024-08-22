@@ -133,7 +133,7 @@ app.post('/register', async (req, res) => {
             // Insert new user into the database
             await pool.query(
             'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
-            [username, email, hashedPassword]
+            [username, email, password]
          );
             
             req.flash('successMessage', 'Registration Successful! Please Login');
