@@ -171,7 +171,7 @@ app.post('/login', async (req, res) => {
         }
 
         // If valid, store user data in the session and redirect to the dashboard
-        // req.session.user = user;
+        req.session.user = user;
         req.flash('successMessage', 'Welcome to your dashboard!');
         res.redirect('/profile');
     
