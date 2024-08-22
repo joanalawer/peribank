@@ -71,10 +71,6 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
-app.get('/profile', (req, res) => {
-    res.render('profile');
-});
-
 app.get('/balance', (req, res) => {
     res.render('balance');
 });
@@ -178,6 +174,15 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/profile', (req, res) => {
+    if (!req.session.user) {
+        req.flash('errorMessage', 'Please login to acces your account.');
+        return res.redirect('/login');
+    }
+
+    res.render('profile', {successMessage: req.flash('successMessage')});
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -187,7 +192,6 @@ app.get('/logout', (req, res) => {
         }
         res.redirect('/login');
     });
-    res.render('index');
 });
 
 app.listen(3000, () => {
