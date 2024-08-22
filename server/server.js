@@ -163,8 +163,14 @@ app.post('/login', async (req, res) => {
             return res.redirect('/login');
         }
 
-        // If valid, store user data in the session and redirect to the dashboard
-        req.session.user = user;
+        // If valid, store user data in the session
+        req.session.user = {
+            id:user.id,
+            username: user.username,
+            email: user.email
+        };
+
+        // redirect to the user profile
         req.flash('successMessage', 'Welcome to your dashboard!');
         res.redirect('/profile');
     
@@ -180,7 +186,8 @@ app.get('/profile', (req, res) => {
         return res.redirect('/login');
     }
 
-    res.render('profile', {successMessage: req.flash('successMessage')});
+    const username = req.session.user.username;
+    res.render('profile', {username: username, successMessage: req.flash('successMessage')});
 });
 
 app.get('/logout', (req, res) => {
