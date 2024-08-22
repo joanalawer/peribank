@@ -120,7 +120,7 @@ app.post('/register', async (req, res) => {
     else {
         try {
         // Check if email already exists
-            pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+            const results = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
 
             if (results.rows.length > 0) {
                 req.flash('errorMessage', 'Email already exists!');
@@ -131,7 +131,7 @@ app.post('/register', async (req, res) => {
             let hashedPassword = await bcrypt.hash(password, 10);
 
             // Insert new user into the database
-            pool.query(
+            await pool.query(
             'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
             [username, email, hashedPassword]
          );
