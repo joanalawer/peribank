@@ -85,10 +85,10 @@
                                 </div>
                             </div>
                             <!-- Error Messages -->
-                            <% if (errorMessage && errorMessage.length > 0) { %>
+                            <% if (errorMessage) { %>
                                 <ul class="error-list">
                                     <% errorMessage.forEach(function(error) { %>
-                                        <li><%= error.message %></li>
+                                        <li><%= errorMessage %></li>
                                     <% }); %>
                                 </ul>
                             <% } %>
