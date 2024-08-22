@@ -146,35 +146,38 @@ app.post('/register', async (req, res) => {
     }
 });
   
-// app.post('/login', async (req, res) => {
-//     const { username, password } = req.body;
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
 
-//     // Query to fetch user data
-//     const query = 'SELECT * FROM users WHERE username = $1';
-//     const values = [username];
+    // Query to fetch user data
+    const query = 'SELECT * FROM users WHERE email = $1';
+    const values = [email];
 
-//     try {
-//         const result = await pool.query(query, values);
+    try {
+        const result = await pool.query(query, values);
 
-//         if (result.rows.length === 0) {
-//             return res.status(401).send('Invalid Username or Password');
-//         }
+        if (result.rows.length === 0) {
+            req.flash('errorMessage', 'Invalid Username or Password');
+            return res.redirect('/login');
+        }
 
-//         const user = result.rows[0];
+        const user = result.rows[0];
 
-//         // Compare the hashed password
-//         const match = await bcrypt.compare(password, user.password);
-//         if (!match) {
-//             return res.status(401).send('Invalid Username or Password');
-//         }
+        // Compare the hashed password
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            req.flash('errorMessage', 'Invalid Username or Password');
+            return res.redirect('/login');
+        }
 
-//         // If valid, redirect to the dashboard or desired page
-//         res.redirect('/profile');
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send('Server Error');
-//     }
-// });
+        // If valid, store user data in the session and redirect to the dashboard
+        // req.session.user = user;
+        res.redirect('/profile');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error. Please try again later.');
+    }
+});
 
 app.get('/profile', (req, res) => {
     res.send('Welcome to your dashboard!');
