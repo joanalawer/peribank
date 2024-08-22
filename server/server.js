@@ -95,9 +95,6 @@ app.get('/close_account', (req, res) => {
     res.render('close_account');
 });
 
-app.get('/logout', (req, res) => {
-    res.render('index');
-});
 
 app.post('/register', async (req, res) => {
     let { username, email, password, password2 } = req.body;
@@ -179,6 +176,18 @@ app.post('/login', async (req, res) => {
         console.error(err);
         res.status(500).send('Server Error. Please try again later.');
     }
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            req.flash('errorMessage', 'Failed to log out. Please try again.');
+            return res.redirect('/profile');
+        }
+        res.redirect('/login');
+    });
+    res.render('index');
 });
 
 app.listen(3000, () => {
