@@ -5,6 +5,7 @@ const { pool } = require('./db');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('connect-flash');
+const { v4: uudv4 } = require('uuid');
 require('dotenv').config();
 
 
@@ -14,12 +15,8 @@ app.set('view engine', 'html');
 
 // Set the views directory to /pages
 app.set('views', path.join(__dirname, 'pages'));
-
 // Serve static files from /public directory
-// app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
-
-
 
 app.use(express.urlencoded({ extended: false }));
 
