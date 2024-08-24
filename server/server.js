@@ -5,7 +5,7 @@ const { pool } = require('./db');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 const flash = require('connect-flash');
-const { v4: uudv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 
@@ -118,7 +118,7 @@ app.post('/register', async (req, res) => {
             }
 
             // Generate a unique user ID
-            let userID = uuidv4();
+            let userID = uuidv4().slice(0, 5);
 
             // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
