@@ -117,6 +117,9 @@ app.post('/register', async (req, res) => {
                 return res.redirect('/register');
             }
 
+            // Generate a unique user ID
+            let userID = uuidv4();
+            
             // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
 
