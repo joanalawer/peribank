@@ -119,14 +119,14 @@ app.post('/register', async (req, res) => {
 
             // Generate a unique user ID
             let userID = uuidv4();
-            
+
             // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
 
             // Insert new user into the database
             await pool.query(
-            'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
-            [username, email, hashedPassword]
+            'INSERT INTO users (user_id, username, email, password) VALUES ($1, $2, $3, $4)',
+            [userID, username, email, hashedPassword]
          );
             
             req.flash('successMessage', 'Registration Successful! Please Login');
