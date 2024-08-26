@@ -72,7 +72,7 @@
     </header>
     <!-- end header -->
 
-    <!-- register section -->
+    <!-- balance section -->
       <div class="new_acc container">
          <div class="col-md-12 ">
              <div class="about_border">
@@ -85,9 +85,14 @@
                                  </div>
                              </div>
                              <div class="col-md-10 offset-md-1">
-                                 <form id="request" class="register_form">
+                                 <form id="request" class="register_form" action="/balance" method="POST">
                                      <!-- <h2>Personal Details</h2> -->
                                      <hr>
+                                     <div id="balanceDisplay">
+                                        <% if (balance !== undefined) { %>
+                                            <h1>Your Current Balance: $<%= balance %></h1>
+                                        <% } %>
+                                     </div>
                                      <div class="row">
                                          <div class="col-md-6">
                                              <input class="new_user" placeholder="User ID" name="user_id" required>
