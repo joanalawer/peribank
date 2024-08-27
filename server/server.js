@@ -68,6 +68,19 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
+app.get('/profile', (req, res) => {
+    if (!req.session.user) {
+        req.flash('errorMessage', 'Please login to access your account.');
+        return res.redirect('/login');
+    }
+
+    const username = req.session.user.username;
+    res.render('profile', {username: username, successMessage: req.flash('successMessage')});
+});
+
+app.get ('/balance', (req, res) => {
+    res.render('balance');
+});
 
 app.get('/deposit', (req, res) => {
     res.render('deposit');
@@ -177,16 +190,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/profile', (req, res) => {
-    if (!req.session.user) {
-        req.flash('errorMessage', 'Please login to acces your account.');
-        return res.redirect('/login');
-    }
-
-    const username = req.session.user.username;
-    res.render('profile', {username: username, successMessage: req.flash('successMessage')});
-});
-
 // Balance route
 app.post('/balance', async (req, res) => {
     const { user_id, password } = req.body;
@@ -200,8 +203,8 @@ app.post('/balance', async (req, res) => {
         }
 
         const user = result.rows[0];
-        const match = await bcrypt.compare(password, user.password);
 
+        const match = await bcrypt.compare(password, user.password);
         if (!match) {
             req.flash('errorMessage', 'Invalid User ID or Password');
             return res.redirect('/balance');
