@@ -78,7 +78,7 @@ app.get('/profile', (req, res) => {
     res.render('profile', {username: username, successMessage: req.flash('successMessage')});
 });
 
-app.get ('/balance', (req, res) => {
+app.get('/balance', (req, res) => {
     res.render('balance');
 });
 
@@ -195,27 +195,39 @@ app.post('/balance', async (req, res) => {
     const { user_id, password } = req.body;
 
     try {
-        const result = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+        // Step 1: Fetch the user details from the 'users' table
+        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
 
-        if (result.rows.length === 0) {
+        if (userResult.rows.length === 0) {
             req.flash('errorMessage', 'Invalid User ID or Password');
             return res.redirect('/balance');
         }
 
-        const user = result.rows[0];
+        const user = userResult.rows[0];
 
+        // Step 2: Verify the password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
             req.flash('errorMessage', 'Invalid User ID or Password');
             return res.redirect('/balance');
         }
 
-        // Retrieve and display the balance here
-        req.flash('successMessage', `Your balance is: $${user.balance}`);
-        res.redirect('/balance');
+        // Step 3: Fetch the balance from the balance table (assuming the table is named 'balances')
+        const balanceResult = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
+
+        if (balanceResult.rows.length === 0) {
+            req.flash('errorMessage', 'Balance information not found');
+            return res.redirect('/balance');
+        }
+
+        const balance = balanceResult.rows[0].balance;
+
+        // Step 4: Render the balance page with the retrieved balance
+        res.render('balance', { balance });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Server Error. Please try again later.');
+        req.flash('errorMessage', 'Server Error. Please try again later.');
+        res.redirect('/balance');
     }
 });
 
