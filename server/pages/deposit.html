@@ -85,30 +85,38 @@
                                 </div>
                             </div>
                             <div class="col-md-10 offset-md-1">
-                                <form id="request" class="register_form">
-                                    <!-- <h2>Personal Details</h2> -->
+                                <!-- Display flash messages -->
+                                <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+                                    <div class="alert alert-success" style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px;">
+                                        <%= successMessage %>
+                                    </div>
+                                <% } %>
+                                <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+                                    <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px;">
+                                        <%= errorMessage %>
+                                    </div>
+                                <% } %>
+                            
+                                <form method="POST" action="/deposit" class="register_form">
                                     <hr>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input class="new_user" placeholder="Account Number" name="lastname" required>
+                                            <input class="new_user" placeholder="Amount" type="number" step="0.01" name="amount" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <input class="new_user" placeholder="Amount" name="email" required>
+                                            <input class="new_user" placeholder="User ID" type="text" name="user_id" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <input class="new_user" placeholder="User ID" name="user_id" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input class="new_user" placeholder="Password" name="password" required>
+                                            <input class="new_user" placeholder="Password" type="password" name="password" required>
                                         </div>
                                     </div>
                                     <hr>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input class="register_btn" type="submit" value="DEPOSIT">
+                                            <button class="register_btn" type="submit">DEPOSIT</button>
                                         </div>
                                         <div class="col-md-6">
-                                            <input class="register_btn" type="button" value="Cancel">
+                                            <a href="/profile" class="register_btn" style="display: inline-block; text-align: center; text-decoration: none; line-height: 50px;">Cancel</a>
                                         </div>
                                     </div>
                                 </form>
@@ -190,6 +198,6 @@
       <script src="../js/bootstrap.bundle.min.js"></script>
       <script src="../js/jquery-3.0.0.min.js"></script>
       <script src="../js/custom.js"></script>
-      <script src="../js/app.js"></script>
+      <!-- <script src="../js/app.js"></script> -->
    </body>
 </html>
