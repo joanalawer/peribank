@@ -13,7 +13,11 @@ router.post('/register', async (req, res) => {
       'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *',
       [username, hashedPassword, email]
     );
-
+    // create user balance record
+    await pool.query(
+      'INSERT INTO balances (user_id, balance) VALUES ($1, $2)',
+      [userID, 0.00]
+    );
     res.json({ message: 'User registered successfully', user: newUser.rows[0] });
   } catch (error) {
     res.status(500).json({ message: 'Error registering user' });
@@ -44,3 +48,5 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
+
+// Balance check
