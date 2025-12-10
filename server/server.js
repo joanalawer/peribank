@@ -78,13 +78,81 @@ app.get('/profile', (req, res) => {
     res.render('profile', {username: username, successMessage: req.flash('successMessage')});
 });
 
-app.get('/balance', (req, res) => {
-    res.render('balance');
-});
-
+// Deposit routes
 app.get('/deposit', (req, res) => {
-    res.render('deposit');
+    if (!req.session.user) {
+        req.flash('errorMessage', 'Please login to access this page.');
+        return res.redirect('/login');
+    }
+    res.render('deposit', {
+        successMessage: req.flash('successMessage'),
+        errorMessage: req.flash('errorMessage')
+    });
 });
+// Deposit POST route
+app.post('/deposit', async (req, res) => {
+    console.log('============ DEPOSIT ROUTE HIT ============');
+    console.log('Request body:', req.body);
+    console.log('==========================================');
+    
+    const { user_id, password, amount } = req.body;
+
+    try {
+        // Step 1: Fetch and verify user
+        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+
+        if (userResult.rows.length === 0) {
+            req.flash('errorMessage', 'Invalid User ID or Password');
+            return res.redirect('/deposit');
+        }
+
+        const user = userResult.rows[0];
+
+        // Step 2: Verify password
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            req.flash('errorMessage', 'Invalid User ID or Password');
+            return res.redirect('/deposit');
+        }
+
+        // Step 3: Validate amount
+        const depositAmount = parseFloat(amount);
+        if (isNaN(depositAmount) || depositAmount <= 0) {
+            req.flash('errorMessage', 'Please enter a valid amount');
+            return res.redirect('/deposit');
+        }
+
+        // Step 4: Check if balance record exists
+        const balanceCheck = await pool.query('SELECT * FROM balances WHERE user_id = $1', [user_id]);
+
+        if (balanceCheck.rows.length === 0) {
+            // Create new balance record
+            await pool.query(
+                'INSERT INTO balances (user_id, balance) VALUES ($1, $2)',
+                [user_id, depositAmount]
+            );
+        } else {
+            // Update existing balance
+            await pool.query(
+                'UPDATE balances SET balance = balance + $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2',
+                [depositAmount, user_id]
+            );
+        }
+
+        // Step 5: Get updated balance
+        const updatedBalance = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
+        const newBalance = updatedBalance.rows[0].balance;
+
+        req.flash('successMessage', `Deposit successful! New balance: GHS ${newBalance}`);
+        res.redirect('/deposit');
+
+    } catch (err) {
+        console.error(err);
+        req.flash('errorMessage', 'Server Error. Please try again later.');
+        res.redirect('/deposit');
+    }
+});
+// Deposit route ends
 
 app.get('/withdraw', (req, res) => {
     res.render('withdraw');
@@ -97,7 +165,6 @@ app.get('/transfer', (req, res) => {
 app.get('/close_account', (req, res) => {
     res.render('close_account');
 });
-
 
 app.post('/register', async (req, res) => {
     let { username, email, password, password2 } = req.body;
@@ -191,6 +258,10 @@ app.post('/login', async (req, res) => {
 });
 
 // Balance route
+app.get('/balance', (req, res) => {
+    res.render('balance');
+});
+
 app.post('/balance', async (req, res) => {
     const { user_id, password } = req.body;
 
