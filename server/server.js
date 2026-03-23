@@ -4,6 +4,7 @@ const app = express();
 const { pool } = require('./db');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
@@ -20,11 +21,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.urlencoded({ extended: false }));
 
+// Set up the session
 app.use(session({
-    secret: 'secret_key',
+    store: new pgSession({ pool }),           // ← replaces MemoryStore
+    secret: process.env.SESSION_SECRET,       // ← use env variable
     resave: false,
-    saveUninitialized: true
-    // cookie: { secure: false }
+    saveUninitialized: false,
+    // cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }     // 30 days
 }));
 
 // Initialise flash middleware
@@ -313,6 +316,6 @@ app.get('/logout', (req, res) => {
     });
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
