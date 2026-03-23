@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 // Set up the session
 app.use(session({
     store: new pgSession({ pool }),           // ← replaces MemoryStore
-    secret: process.env.SESSION_SECRET,       // ← use env variable
+    secret: process.env.SESSION_SECRET || 'peribank_secret_2026',       // ← use env variable
     resave: false,
     saveUninitialized: false,
     // cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }     // 30 days
