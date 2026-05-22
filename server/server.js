@@ -91,11 +91,7 @@ app.get('/profile', (req, res) => {
 
 // ============= DEPOSIT ROUTE ============ //
 // Deposit GET routes
-app.get('/deposit', (req, res) => {
-    if (!req.session.user) {
-        req.flash('errorMessage', 'Please login to access this page.');
-        return res.redirect('/login');
-    }
+app.get('/deposit', requireLogin, (req, res) => {
     res.render('deposit', {
         successMessage: req.flash('successMessage'),
         errorMessage: req.flash('errorMessage')
@@ -105,37 +101,35 @@ app.get('/deposit', (req, res) => {
 // Deposit POST route
 app.post('/deposit', async (req, res) => {
     console.log('============ DEPOSIT ROUTE HIT ============');
-    console.log('Request body:', req.body);
-    console.log('==========================================');
+    // console.log('Request body:', req.body);
+    // console.log('==========================================');
     
-    const { user_id, password, amount } = req.body;
+    const { amount, user_id, password } = req.body;
+
+    // Validate all fields
+    if (!user_id || !password || !amount) {
+        req.flash('errorMessage', 'Please fill in all fields');
+        return res.redirect('/deposit');
+    }
 
     try {
-        // Step 1: Fetch and verify user
-        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
-
-        if (userResult.rows.length === 0) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
+        // Verify credentials
+        const credentialsCheck = await verifyUserCredentials(user_id, password);
+        if (!credentialsCheck.success) {
+            req.flash('errorMessage', credentialsCheck.message);
             return res.redirect('/deposit');
         }
 
-        const user = userResult.rows[0];
-
-        // Step 2: Verify password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
+        // Validate amount
+        const amountCheck = validateAmount(amount);
+        if (!amountCheck.valid) {
+            req.flash('errorMessage', amountCheck.message);
             return res.redirect('/deposit');
         }
 
-        // Step 3: Validate amount
-        const depositAmount = parseFloat(amount);
-        if (isNaN(depositAmount) || depositAmount <= 0) {
-            req.flash('errorMessage', 'Please enter a valid amount');
-            return res.redirect('/deposit');
-        }
+        const depositAmount = amountCheck.amount;
 
-        // Step 4: Check if balance record exists
+        // Check if balance record exists
         const balanceCheck = await pool.query('SELECT * FROM balances WHERE user_id = $1', [user_id]);
 
         if (balanceCheck.rows.length === 0) {
@@ -152,7 +146,7 @@ app.post('/deposit', async (req, res) => {
             );
         }
 
-        // Step 5: Get updated balance
+        // Get updated balance
         const updatedBalance = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
         const newBalance = updatedBalance.rows[0].balance;
 
@@ -170,10 +164,6 @@ app.post('/deposit', async (req, res) => {
 // ============= WITHDRAW ROUTE ============ //
 // Withdraw GET routes
 app.get('/withdraw', (req, res) => {
-    if (!req.session.user) {
-        req.flash('errorMessage', 'Please login to access this page.');
-        return res.redirect('/login');
-    }
     res.render('withdraw', {
         successMessage: req.flash('successMessage'),
         errorMessage: req.flash('errorMessage')
@@ -182,51 +172,45 @@ app.get('/withdraw', (req, res) => {
 
 // Withdraw POST route
 app.post('/withdraw', async (req, res) => {
-    
+    console.log('============= WITHDRAW ROUTE HIT ============');
+
     const { amount, user_id, password } = req.body;
 
-    try {
-        // Fetch and verify user
-        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+    // Validate all fields
+    if (!user_id || !password || !amount) {
+        req.flash('errorMessage', 'Please fill in all fields');
+        return res.redirect('/withdraw');
+    }
 
-        if (userResult.rows.length === 0) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
-            return res.redirect('/withdraw');
-        }
-        const user = userResult.rows[0];
-        // Verify password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match ) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
+    try {
+        // Verify credentials
+        const credentialsCheck = await verifyUserCredentials(user_id, password);
+        if (!credentialsCheck.success) {
+            req.flash('errorMessage', credentialsCheck.message);
             return res.redirect('/withdraw');
         }
         // Validate amount
-        const withdrawAmount  = parseFloat(amount);
-        if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
-            req.flash('errorMessage', 'Please enter a valid amount');
+        const amountCheck = validateAmount(amount);
+        if (!amountCheck.valid) {
+            req.flash('errorMessage', amountCheck.message);
             return res.redirect('/withdraw');
         }
-        // Check balance records
-        const balanceCheck = await pool.query('SELECT * FROM balances WHERE user_id = $1', [user_id]);
-        
-        if (balanceCheck.rows.length === 0) {
-            req.flash('errorMessage', 'You have no available balance');
-            return res.redirect('/withdaw');
-        }
-        const currentBalance = balanceCheck.rows[0].balance;
 
-        // Check if balance is sufficient
-        if (currentBalance < withdrawAmount) {
-            req.flash('errorMessage', 'Insufficient balance. Current balance: GHS ${currentBalance}');
-            return res.redirect('/withdraw)');
+        const withdrawAmount = amountCheck.amount;
+
+        // Check sufficient balance
+        const balanceCheck = await checkSufficientBalance(user_id, withdrawAmount);
+        if (!balanceCheck.success) {
+            req.flash('errorMessage', balanceCheck.message);
+            return res.redirect('/withdraw');
         }
         // Update balance
         await pool.query('UPDATE balances SET balance = balance - $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2', 
             [withdrawAmount, user_id]
         );
         // Get updated balance
-        const updatedBalance = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
-        const newBalance = updatedBalance.rows[0].balance;
+        const balanceResult = await getUserBalance(user_id);
+        const newBalance = balanceResult.balance;
 
         console.log('Withdrawal successful. New balance:', newBalance);
 
@@ -234,7 +218,7 @@ app.post('/withdraw', async (req, res) => {
         res.redirect('/withdraw');
 
     } catch (err) {
-        console.error(err);
+        console.error('Error in withdraw route', err);
         req.flash('errorMessage', 'Server Error. Please try again later.');
         res.redirect('/withdraw');
     }
