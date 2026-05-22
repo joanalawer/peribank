@@ -81,7 +81,8 @@ app.get('/profile', (req, res) => {
     res.render('profile', {username: username, successMessage: req.flash('successMessage')});
 });
 
-// Deposit routes
+// ============= DEPOSIT ROUTE ============ //
+// Deposit GET routes
 app.get('/deposit', (req, res) => {
     if (!req.session.user) {
         req.flash('errorMessage', 'Please login to access this page.');
@@ -156,11 +157,81 @@ app.post('/deposit', async (req, res) => {
         res.redirect('/deposit');
     }
 });
-// Deposit route ends
+// ============= DEPOSIT ROUTE ENDS ============
 
+// ============= WITHDRAW ROUTE ============ //
+// Withdraw GET routes
 app.get('/withdraw', (req, res) => {
-     res.render('withdraw');
+    if (!req.session.user) {
+        req.flash('errorMessage', 'Please login to access this page.');
+        return res.redirect('/login');
+    }
+    res.render('withdraw', {
+        successMessage: req.flash('successMessage'),
+        errorMessage: req.flash('errorMessage')
+    });
 });
+
+// Withdraw POST route
+app.post('/withdraw', async (req, res) => {
+    
+    const { amount, user_id, password } = req.body;
+
+    try {
+        // Fetch and verify user
+        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+
+        if (userResult.rows.length === 0) {
+            req.flash('errorMessage', 'Invalid User ID or Password');
+            return res.redirect('/withdraw');
+        }
+        const user = userResult.rows[0];
+        // Verify password
+        const match = await bcrypt.compare(password, user.password);
+        if (!match ) {
+            req.flash('errorMessage', 'Invalid User ID or Password');
+            return res.redirect('/withdraw');
+        }
+        // Validate amount
+        const withdrawAmount  = parseFloat(amount);
+        if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
+            req.flash('errorMessage', 'Please enter a valid amount');
+            return res.redirect('/withdraw');
+        }
+        // Check balance records
+        const balanceCheck = await pool.query('SELECT * FROM balances WHERE user_id = $1', [user_id]);
+        
+        if (balanceCheck.rows.length === 0) {
+            req.flash('errorMessage', 'You have no available balance');
+            return res.redirect('/withdaw');
+        }
+        const currentBalance = balanceCheck.rows[0].balance;
+
+        // Check if balance is sufficient
+        if (currentBalance < withdrawAmount) {
+            req.flash('errorMessage', 'Insufficient balance. Current balance: GHS ${currentBalance}');
+            return res.redirect('/withdraw)');
+        }
+        // Update balance
+        await pool.query('UPDATE balances SET balance = balance - $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2', 
+            [withdrawAmount, user_id]
+        );
+        // Get updated balance
+        const updatedBalance = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
+        const newBalance = updatedBalance.rows[0].balance;
+
+        console.log('Withdrawal successful. New balance:', newBalance);
+
+        req.flash('successMessage', `Withdrawal successful! New balance: GHS ${newBalance}`);
+        res.redirect('/withdraw');
+
+    } catch (err) {
+        console.error(err);
+        req.flash('errorMessage', 'Server Error. Please try again later.');
+        res.redirect('/withdraw');
+    }
+});
+// ============= WITHDRAW ROUTE ENDS ============ //
 
 app.get('/transfer', (req, res) => {
     res.render('transfer');
