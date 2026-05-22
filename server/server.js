@@ -4,7 +4,7 @@ const app = express();
 const { pool } = require('./db');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
-const pgSession = require('connect-pg-simple')(session);
+// const pgSession = require('connect-pg-simple')(session);
 const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Set up the session
 app.use(session({
-    store: new pgSession({ pool }),           // ← replaces MemoryStore
+    // store: new pgSession({ pool }),           // ← replaces MemoryStore
     secret: process.env.SESSION_SECRET || 'peribank_secret_2026',       // ← use env variable
     resave: false,
     saveUninitialized: false,
@@ -92,6 +92,7 @@ app.get('/deposit', (req, res) => {
         errorMessage: req.flash('errorMessage')
     });
 });
+
 // Deposit POST route
 app.post('/deposit', async (req, res) => {
     console.log('============ DEPOSIT ROUTE HIT ============');
@@ -158,7 +159,7 @@ app.post('/deposit', async (req, res) => {
 // Deposit route ends
 
 app.get('/withdraw', (req, res) => {
-    res.render('withdraw');
+     res.render('withdraw');
 });
 
 app.get('/transfer', (req, res) => {
