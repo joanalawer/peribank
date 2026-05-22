@@ -163,7 +163,7 @@ app.post('/deposit', async (req, res) => {
 
 // ============= WITHDRAW ROUTE ============ //
 // Withdraw GET routes
-app.get('/withdraw', (req, res) => {
+app.get('/withdraw', requireLogin, (req, res) => {
     res.render('withdraw', {
         successMessage: req.flash('successMessage'),
         errorMessage: req.flash('errorMessage')
