@@ -9,6 +9,14 @@ const flash = require('connect-flash');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
+// Import middleware and helpers
+const { 
+    requireLogin, 
+    verifyUserCredentials, 
+    validateAmount, 
+    getUserBalance,
+    checkSufficientBalance 
+} = require('./middleware/auth');
 
 // Set EJS as the templating engine for .html files
 app.engine('.html', require('ejs').__express);
