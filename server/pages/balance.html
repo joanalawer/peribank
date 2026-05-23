@@ -88,6 +88,24 @@
                                  <form id="request" class="register_form" action="/balance" method="POST">
                                      <!-- <h2>Personal Details</h2> -->
                                      <hr>
+                                     <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+                                        <div class="alert alert-success" style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px;">
+                                            <%= successMessage %>
+                                        </div>
+                                     <% } %>
+                                     <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+                                         <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px;">
+                                             <%= errorMessage %>
+                                         </div>
+                                     <% } %>
+                                     
+                                     <!-- Display balance if available -->
+                                     <% if (typeof balance !== 'undefined' && balance !== null) { %>
+                                         <div class="alert alert-info" style="padding: 20px; background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; border-radius: 4px; margin-bottom: 20px; text-align: center;">
+                                             <h3>Your Current Balance</h3>
+                                             <h2 style="font-size: 2.5em; margin: 10px 0;">GHS <%= parseFloat(balance).toFixed(2) %></h2>
+                                         </div>
+                                     <% } %>
                                      <div class="row">
                                          <div class="col-md-6">
                                              <input class="new_user" placeholder="Account Number" name="user_id" required>
