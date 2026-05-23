@@ -226,25 +226,25 @@ app.get('/deposit', requireLogin, (req, res) => {
 // Deposit POST route
 app.post('/deposit', async (req, res) => {
     console.log('============ DEPOSIT ROUTE HIT ============');
-    // console.log('Request body:', req.body);
-    // console.log('==========================================');
     
-    const { amount, user_id, password } = req.body;
+    const { account_number, password, amount } = req.body;
 
     // Validate all fields
-    if (!user_id || !password || !amount) {
+    if (!account_number || !password || !amount) {
         req.flash('errorMessage', 'Please fill in all fields');
         return res.redirect('/deposit');
     }
 
     try {
         // Verify credentials
-        const credentialsCheck = await verifyUserCredentials(user_id, password);
+        const credentialsCheck = await verifyUserCredentials(account_number, password);
         if (!credentialsCheck.success) {
             req.flash('errorMessage', credentialsCheck.message);
             return res.redirect('/deposit');
         }
-
+        
+        const user_id = credentialsCheck.user.user_id;
+        
         // Validate amount
         const amountCheck = validateAmount(amount);
         if (!amountCheck.valid) {
@@ -272,8 +272,8 @@ app.post('/deposit', async (req, res) => {
         }
 
         // Get updated balance
-        const updatedBalance = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
-        const newBalance = updatedBalance.rows[0].balance;
+        const updatedBalance = await getUserBalance(account_number);
+        const newBalance = updatedBalance.balance;
 
         req.flash('successMessage', `Deposit successful! New balance: GHS ${newBalance}`);
         res.redirect('/deposit');
@@ -352,22 +352,6 @@ app.post('/withdraw', async (req, res) => {
 // ============= WITHDRAW ROUTE ENDS ============ //
 
 
-// ============= TRANSFER ROUTE ============ //
-// Teansfer GET route
-app.get('/transfer', requireLogin, (req, res) => {
-    res.render('transfer');
-});
-// ============= TRANSFER ROUTE ENDS ============ //
-
-
-// ============= CLOSE ACCOUNT ROUTE ============ //
-// Close Account GET route
-app.get('/close_account', requireLogin, (req, res) => {
-    res.render('close_account');
-});
-// ============= CLOSE ACCOUNT ROUTE ENDS ============ //
-
-
 // ============= BALANCE ROUTE ENDS ============ //
 // Balance route
 app.get('/balance', requireLogin, (req, res) => {
@@ -422,6 +406,22 @@ app.post('/balance', async (req, res) => {
     }
 });
 // ============= BALANCE ROUTE ENDS ============ //
+
+// ============= TRANSFER ROUTE ============ //
+// Teansfer GET route
+app.get('/transfer', requireLogin, (req, res) => {
+    res.render('transfer');
+});
+// ============= TRANSFER ROUTE ENDS ============ //
+
+
+// ============= CLOSE ACCOUNT ROUTE ============ //
+// Close Account GET route
+app.get('/close_account', requireLogin, (req, res) => {
+    res.render('close_account');
+});
+// ============= CLOSE ACCOUNT ROUTE ENDS ============ //
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
