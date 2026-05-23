@@ -127,17 +127,23 @@ app.post('/register', async (req, res) => {
                     accountExists = false;
                 }
             }
-            
+
             // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
 
             // Insert new user into the database
             await pool.query(
-            'INSERT INTO users (user_id, username, email, password) VALUES ($1, $2, $3, $4)',
-            [userID, username, email, hashedPassword]
-         );
+                'INSERT INTO users (user_id, username, email, password, account_number) VALUES ($1, $2, $3, $4, $5)',
+                [userID, username, email, hashedPassword, accountNumber]
+            );
+
+            // Initialize balance for new user
+            await pool.query(
+                'INSERT INTO balances (user_id, balance) VALUES ($1, $2)',
+                [userID, 0.00]
+            );
             
-            req.flash('successMessage', 'Registration Successful! Please Login');
+            req.flash('successMessage', 'Registration Successful! Your account number is: ${accountNumber}. Please Login');
             res.redirect('/login');
         } catch (err) {
             console.error(err.message);
