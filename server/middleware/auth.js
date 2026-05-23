@@ -11,14 +11,14 @@ const requireLogin = (req, res, next) => {
     next();
 };
 
-// Helper function to verify user credentials
-const verifyUserCredentials = async (user_id, password) => {
+// Helper function to verify user credentials (accountNumber OR user_id)
+const verifyUserCredentials = async (identifier, password) => {
     try {
         // Fetch user
-        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1 OR account_number =$1', [identifier]);
 
         if (userResult.rows.length === 0) {
-            return { success: false, message: 'Invalid User ID or Password' };
+            return { success: false, message: 'Invalid User ID/Account Number or Password' };
         }
 
         const user = userResult.rows[0];
@@ -26,7 +26,7 @@ const verifyUserCredentials = async (user_id, password) => {
         // Verify password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return { success: false, message: 'Invalid User ID or Password' };
+            return { success: false, message: 'Invalid User ID/Account Number or Password' };
         }
 
         return { success: true, user };
@@ -47,16 +47,32 @@ const validateAmount = (amount) => {
     return { valid: true, amount: parsedAmount };
 };
 
-// Helper function to get user balance
-const getUserBalance = async (user_id) => {
+// Helper function to get user balance (accepts account_number OR user_id)
+const getUserBalance = async (identifier) => {
     try {
-        const result = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
+        // First get the user_id from account_number or user_id
+        const userResult = await pool.query(
+            'SELECT user_id FROM users WHERE account_number = $1 OR user_id = $1',
+            [identifier]
+        );
+
+        if (userResult.rows.length === 0) {
+            return { success: false, message: 'User not found' };
+        }
+
+        const user_id = userResult.rows[0].user_id;
+
+        // Then get the balance using user_id
+        const result = await pool.query(
+            'SELECT balance FROM balances WHERE user_id = $1', 
+            [user_id]
+        );
         
         if (result.rows.length === 0) {
             return { success: false, message: 'Balance record not found' };
         }
         
-        return { success: true, balance: result.rows[0].balance };
+        return { success: true, balance: result.rows[0].balance, user_id: user_id };
     } catch (error) {
         console.error('Error fetching balance:', error);
         return { success: false, message: 'Error fetching balance' };
@@ -64,8 +80,8 @@ const getUserBalance = async (user_id) => {
 };
 
 // Helper function to check sufficient balance
-const checkSufficientBalance = async (user_id, amount) => {
-    const balanceResult = await getUserBalance(user_id);
+const checkSufficientBalance = async (identifier, amount) => {
+    const balanceResult = await getUserBalance(identifier);
     
     if (!balanceResult.success) {
         return balanceResult;
@@ -79,7 +95,7 @@ const checkSufficientBalance = async (user_id, amount) => {
         };
     }
     
-    return { success: true, balance: balanceResult.balance };
+    return { success: true, balance: balanceResult.balance, user_id: balanceResult.user_id };
 };
 
 module.exports = {
