@@ -109,6 +109,25 @@ app.post('/register', async (req, res) => {
             // Generate a unique user ID
             let userID = uuidv4().slice(0, 5);
 
+            // Generate a unique 10-digit account number
+            let accountNumber;
+            let accountExists = true;
+            
+            while (accountExists) {
+                // Generate random 10-digit number
+                accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+                
+                // Check if account number already exists
+                const accountCheck = await pool.query(
+                    'SELECT * FROM users WHERE account_number = $1', 
+                    [accountNumber]
+                );
+                
+                if (accountCheck.rows.length === 0) {
+                    accountExists = false;
+                }
+            }
+            
             // Hash password
             let hashedPassword = await bcrypt.hash(password, 10);
 
