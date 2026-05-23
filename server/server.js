@@ -143,7 +143,7 @@ app.post('/register', async (req, res) => {
                 [userID, 0.00]
             );
             
-            req.flash('successMessage', 'Registration Successful! Your account number is: ${accountNumber}. Please Login');
+            req.flash('successMessage', `Registration Successful! Your account number is: ${accountNumber}. Please Login`);
             res.redirect('/login');
         } catch (err) {
             console.error(err.message);
@@ -211,8 +211,28 @@ app.get('/profile', (req, res) => {
     }
 
     const username = req.session.user.username;
-    res.render('profile', {username: username, successMessage: req.flash('successMessage')});
-});
+    
+    // Fetch account number from database
+    pool.query('SELECT account_number FROM users WHERE email = $1', [email])
+        .then(result => {
+            const accountNumber = result.rows[0]?.account_number || 'N/A';
+            res.render('profile', {
+                username: username,
+                email: email,
+                accountNumber: accountNumber,
+                successMessage: req.flash('successMessage')
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            res.render('profile', {
+                username: username,
+                email: email,
+                accountNumber: 'N/A',
+                successMessage: req.flash('successMessage')
+            });
+        });
+    });
 
 // ============= DEPOSIT ROUTE ============ //
 // Deposit GET routes
