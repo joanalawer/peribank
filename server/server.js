@@ -161,6 +161,7 @@ app.post('/deposit', async (req, res) => {
 });
 // ============= DEPOSIT ROUTE ENDS ============
 
+
 // ============= WITHDRAW ROUTE ============ //
 // Withdraw GET routes
 app.get('/withdraw', requireLogin, (req, res) => {
@@ -225,13 +226,20 @@ app.post('/withdraw', async (req, res) => {
 });
 // ============= WITHDRAW ROUTE ENDS ============ //
 
-app.get('/transfer', (req, res) => {
+
+// ============= TRANSFER ROUTE ============ //
+// Teansfer GET route
+app.get('/transfer', requireLogin, (req, res) => {
     res.render('transfer');
 });
+// ============= TRANSFER ROUTE ENDS ============ //
 
-app.get('/close_account', (req, res) => {
+// ============= CLOSE ACCOUNT ROUTE ============ //
+// Close Account GET route
+app.get('/close_account', requireLogin, (req, res) => {
     res.render('close_account');
 });
+// ============= CLOSE ACCOUNT ROUTE ENDS ============ //
 
 app.post('/register', async (req, res) => {
     let { username, email, password, password2 } = req.body;
@@ -324,50 +332,61 @@ app.post('/login', async (req, res) => {
     }
 });
 
+
+// ============= BALANCE ROUTE ENDS ============ //
 // Balance route
-app.get('/balance', (req, res) => {
-    res.render('balance');
+app.get('/balance', requireLogin, (req, res) => {
+    res.render('balance', {
+        successMessage: req.flash('successMessage'),
+        errorMessage: req.flash('errorMessage')
+    });
 });
 
 app.post('/balance', async (req, res) => {
-    const { user_id, password } = req.body;
+    console.log('============= BALANCE ROUTE HIT ============');
+    
+    const { user_id, password, amount} = req.body;
+
+    // Validate all fields
+    if (!user_id || !password) {
+        req.flash('errorMessage', 'Please fill in all fields');
+        return res.redirect('/balance');
+    }
 
     try {
-        // Step 1: Fetch the user details from the 'users' table
-        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
-
-        if (userResult.rows.length === 0) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
+        // Verify credentials
+        const credentialsCheck = await verifyUserCredentials(user_id, password);
+        if (!credentialsCheck.success) {
+            req.flash('errorMessage', credentialsCheck.message);
             return res.redirect('/balance');
         }
 
-        const user = userResult.rows[0];
-
-        // Step 2: Verify the password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            req.flash('errorMessage', 'Invalid User ID or Password');
+        // Get balance
+        const accountBalance = await getUserBalance(user_id);
+      
+        if (!accountBalance.success) {
+            req.flash('errorMessage', accountBalance.message);
             return res.redirect('/balance');
         }
 
-        // Step 3: Fetch the balance from the balance table (assuming the table is named 'balances')
-        const balanceResult = await pool.query('SELECT balance FROM balances WHERE user_id = $1', [user_id]);
+        const balance = accountBalance.balance;
+        
+        console.log('Account balance:', balance);
 
-        if (balanceResult.rows.length === 0) {
-            req.flash('errorMessage', 'Balance information not found');
-            return res.redirect('/balance');
-        }
+        // Render the balance page with the retrieved balance
+        res.render('balance', { 
+            balance: balance,  // ✅ Fixed: was using undefined 'balance'
+            successMessage: req.flash('successMessage'),
+            errorMessage: req.flash('errorMessage')
+        });
 
-        const balance = balanceResult.rows[0].balance;
-
-        // Step 4: Render the balance page with the retrieved balance
-        res.render('balance', { balance });
     } catch (err) {
-        console.error(err);
+        console.error('Error in balance route:', err);
         req.flash('errorMessage', 'Server Error. Please try again later.');
         res.redirect('/balance');
     }
 });
+// ============= BALANCE ROUTE ENDS ============ //
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
