@@ -70,14 +70,114 @@ app.get('/services', (req, res) => {
 app.get('/contact', (req, res) => {
     res.render('contact');
 });
+// =================================================================================================
 
+
+// ============= REGISTER ROUTE ============
 app.get('/register', (req, res) => {
     res.render('register');
 });
 
+app.post('/register', async (req, res) => {
+    let { username, email, password, password2 } = req.body;
+
+    let errors = [];
+    if (!username || !email || !password || !password2) {
+        errors.push({ message: 'Please enter all fields'});
+    }
+    if (password.length < 8) {
+        errors.push({ message: 'Password should be at least 8 characters'});
+    }
+    if (password != password2) {
+        errors.push({ message: 'Passwords do not match'});
+    }
+    if (errors.length > 0) {
+        // Render the register page with error messages
+        req.flash('errorMessage', errors.map(err => err.message).join(', '));
+        return res.redirect('/register');
+    }
+    else {
+        try {
+        // Check if email already exists
+            const results = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+
+            if (results.rows.length > 0) {
+                req.flash('errorMessage', 'Email already exists!');
+                return res.redirect('/register');
+            }
+
+            // Generate a unique user ID
+            let userID = uuidv4().slice(0, 5);
+
+            // Hash password
+            let hashedPassword = await bcrypt.hash(password, 10);
+
+            // Insert new user into the database
+            await pool.query(
+            'INSERT INTO users (user_id, username, email, password) VALUES ($1, $2, $3, $4)',
+            [userID, username, email, hashedPassword]
+         );
+            
+            req.flash('successMessage', 'Registration Successful! Please Login');
+            res.redirect('/login');
+        } catch (err) {
+            console.error(err.message);
+            req.flash('errorMessage', 'Server error. Please try again later.');
+            res.redirect('/register');
+        }
+    }
+});
+// ============= REGISTER ROUTE ENDS ============
+
+
+// ============= LOGIN ROUTE ============
+// ============= Login GET route ============
 app.get('/login', (req, res) => {
     res.render('login');
 });
+
+// ============= Login POST route ============
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    // Query to fetch user data
+    const query = 'SELECT * FROM users WHERE email = $1';
+    const values = [email];
+
+    try {
+        const result = await pool.query(query, values);
+
+        if (result.rows.length === 0) {
+            req.flash('errorMessage', 'Invalid Username or Password');
+            return res.redirect('/login');
+        }
+
+        const user = result.rows[0];
+
+        // Compare the hashed password
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            req.flash('errorMessage', 'Invalid Username or Password');
+            return res.redirect('/login');
+        }
+
+        // If valid, store user data in the session
+        req.session.user = {
+            id:user.id,
+            username: user.username,
+            email: user.email
+        };
+
+        // redirect to the user profile
+        req.flash('successMessage', 'Welcome to your dashboard!');
+        res.redirect('/profile');
+    
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error. Please try again later.');
+    }
+});
+// ============= LOGIN ROUTE ENDS ============
 
 app.get('/profile', (req, res) => {
     if (!req.session.user) {
@@ -234,103 +334,13 @@ app.get('/transfer', requireLogin, (req, res) => {
 });
 // ============= TRANSFER ROUTE ENDS ============ //
 
+
 // ============= CLOSE ACCOUNT ROUTE ============ //
 // Close Account GET route
 app.get('/close_account', requireLogin, (req, res) => {
     res.render('close_account');
 });
 // ============= CLOSE ACCOUNT ROUTE ENDS ============ //
-
-app.post('/register', async (req, res) => {
-    let { username, email, password, password2 } = req.body;
-
-    let errors = [];
-    if (!username || !email || !password || !password2) {
-        errors.push({ message: 'Please enter all fields'});
-    }
-    if (password.length < 8) {
-        errors.push({ message: 'Password should be at least 8 characters'});
-    }
-    if (password != password2) {
-        errors.push({ message: 'Passwords do not match'});
-    }
-    if (errors.length > 0) {
-        // Render the register page with error messages
-        req.flash('errorMessage', errors.map(err => err.message).join(', '));
-        return res.redirect('/register');
-    }
-    else {
-        try {
-        // Check if email already exists
-            const results = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
-
-            if (results.rows.length > 0) {
-                req.flash('errorMessage', 'Email already exists!');
-                return res.redirect('/register');
-            }
-
-            // Generate a unique user ID
-            let userID = uuidv4().slice(0, 5);
-
-            // Hash password
-            let hashedPassword = await bcrypt.hash(password, 10);
-
-            // Insert new user into the database
-            await pool.query(
-            'INSERT INTO users (user_id, username, email, password) VALUES ($1, $2, $3, $4)',
-            [userID, username, email, hashedPassword]
-         );
-            
-            req.flash('successMessage', 'Registration Successful! Please Login');
-            res.redirect('/login');
-        } catch (err) {
-            console.error(err.message);
-            req.flash('errorMessage', 'Server error. Please try again later.');
-            res.redirect('/register');
-        }
-    }
-});
-  
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    // Query to fetch user data
-    const query = 'SELECT * FROM users WHERE email = $1';
-    const values = [email];
-
-    try {
-        const result = await pool.query(query, values);
-
-        if (result.rows.length === 0) {
-            req.flash('errorMessage', 'Invalid Username or Password');
-            return res.redirect('/login');
-        }
-
-        const user = result.rows[0];
-
-        // Compare the hashed password
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) {
-            req.flash('errorMessage', 'Invalid Username or Password');
-            return res.redirect('/login');
-        }
-
-        // If valid, store user data in the session
-        req.session.user = {
-            id:user.id,
-            username: user.username,
-            email: user.email
-        };
-
-        // redirect to the user profile
-        req.flash('successMessage', 'Welcome to your dashboard!');
-        res.redirect('/profile');
-    
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error. Please try again later.');
-    }
-});
 
 
 // ============= BALANCE ROUTE ENDS ============ //
