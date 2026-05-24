@@ -216,12 +216,11 @@ app.get('/profile', (req, res) => {
     const username = req.session.user.username;
     
     // Fetch account number from database
-    pool.query('SELECT account_number FROM users WHERE email = $1', [email])
+    pool.query('SELECT account_number FROM users WHERE account_number = $1', [account_number])
         .then(result => {
             const accountNumber = result.rows[0]?.account_number || 'N/A';
             res.render('profile', {
                 username: username,
-                email: email,
                 accountNumber: accountNumber,
                 successMessage: req.flash('successMessage')
             });
@@ -230,7 +229,6 @@ app.get('/profile', (req, res) => {
             console.error(err);
             res.render('profile', {
                 username: username,
-                email: email,
                 accountNumber: 'N/A',
                 successMessage: req.flash('successMessage')
             });
