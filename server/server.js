@@ -163,17 +163,17 @@ app.get('/login', (req, res) => {
 
 // ============= Login POST route ============
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { account_number, password } = req.body;
 
     // Query to fetch user data
-    const query = 'SELECT * FROM users WHERE email = $1';
-    const values = [email];
+    const query = 'SELECT * FROM users WHERE account_number = $1';
+    const values = [account_number];
 
     try {
         const result = await pool.query(query, values);
 
         if (result.rows.length === 0) {
-            req.flash('errorMessage', 'Invalid Username or Password');
+            req.flash('errorMessage', 'Invalid Account Number or Password');
             return res.redirect('/login');
         }
 
@@ -182,7 +182,7 @@ app.post('/login', async (req, res) => {
         // Compare the hashed password
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            req.flash('errorMessage', 'Invalid Username or Password');
+            req.flash('errorMessage', 'Invalid Account Number or Password');
             return res.redirect('/login');
         }
 
@@ -190,7 +190,8 @@ app.post('/login', async (req, res) => {
         req.session.user = {
             id:user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            account_number: user.account_number
         };
 
         // redirect to the user profile
@@ -204,6 +205,8 @@ app.post('/login', async (req, res) => {
 });
 // ============= LOGIN ROUTE ENDS ============
 
+
+// ============= PROFILE ROUTE ============
 app.get('/profile', (req, res) => {
     if (!req.session.user) {
         req.flash('errorMessage', 'Please login to access your account.');
@@ -233,6 +236,8 @@ app.get('/profile', (req, res) => {
             });
         });
     });
+// ============= PROFILE ROUTE ENDS ============
+
 
 // ============= DEPOSIT ROUTE ============ //
 // Deposit GET routes
