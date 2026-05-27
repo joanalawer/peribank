@@ -98,10 +98,30 @@ const checkSufficientBalance = async (identifier, amount) => {
     return { success: true, balance: balanceResult.balance, user_id: balanceResult.user_id };
 };
 
+// Helper function to verify receiver account exists
+const verifyAccountExists = async (account_number) => {
+    try {
+        const result = await pool.query(
+            'SELECT user_id, username, account_number FROM users WHERE account_number = $1',
+            [account_number]
+        );
+
+        if (result.rows.length === 0) {
+            return { success: false, message: 'Recipient account not found' };
+        }
+
+        return { success: true, user: result.rows[0] };
+    } catch (error) {
+        console.error('Error verifying account:', error);
+        return { success: false, message: 'Error verifying recipient account' };
+    }
+};
+
 module.exports = {
     requireLogin,
     verifyUserCredentials,
     validateAmount,
     getUserBalance,
-    checkSufficientBalance
+    checkSufficientBalance,
+    verifyAccountExists
 };
