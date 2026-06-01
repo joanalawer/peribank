@@ -214,16 +214,18 @@ app.get('/profile', (req, res) => {
         return res.redirect('/login');
     }
 
-    const username = req.session.user.username;
+    const {username, account_number} = req.session.user;
     
     // Fetch account number from database
-    pool.query('SELECT account_number FROM users WHERE account_number = $1')
+    pool.query('SELECT user_id, account_number FROM users WHERE account_number = $1', [account_number])
         .then(result => {
             const accountNumber = result.rows[0]?.account_number || 'N/A';
+            const userId = result.rows[0]?.user_id || 'N/A';
+
             res.render('profile', {
-                username: username,
-                accountNumber: accountNumber,
-                
+                username,
+                accountNumber,
+                userId,
                 successMessage: req.flash('successMessage')
             });
         })
@@ -232,6 +234,7 @@ app.get('/profile', (req, res) => {
             res.render('profile', {
                 username: username,
                 accountNumber: 'N/A',
+                userId: 'N/A',
                 successMessage: req.flash('successMessage')
             });
         });
