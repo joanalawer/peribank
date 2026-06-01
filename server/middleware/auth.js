@@ -15,7 +15,7 @@ const requireLogin = (req, res, next) => {
 const verifyUserCredentials = async (identifier, password) => {
     try {
         // Fetch user
-        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1 OR account_number =$1', [identifier]);
+        const userResult = await pool.query('SELECT * FROM users WHERE user_id = $1 OR account_number = $2', [identifier, identifier]);
 
         if (userResult.rows.length === 0) {
             return { success: false, message: 'Invalid User ID/Account Number or Password' };
@@ -52,8 +52,8 @@ const getUserBalance = async (identifier) => {
     try {
         // First get the user_id from account_number or user_id
         const userResult = await pool.query(
-            'SELECT user_id FROM users WHERE account_number = $1 OR user_id = $1',
-            [identifier]
+            'SELECT user_id FROM users WHERE account_number = $1 OR user_id = $2',
+            [identifier, identifier]
         );
 
         if (userResult.rows.length === 0) {

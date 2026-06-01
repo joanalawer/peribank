@@ -15,7 +15,8 @@ const {
     verifyUserCredentials, 
     validateAmount, 
     getUserBalance,
-    checkSufficientBalance 
+    checkSufficientBalance,
+    verifyAccountExists 
 } = require('./middleware/auth');
 
 // Set EJS as the templating engine for .html files
@@ -435,6 +436,106 @@ app.post('/balance', async (req, res) => {
 // Teansfer GET route
 app.get('/transfer', requireLogin, (req, res) => {
     res.render('transfer');
+});
+
+app.post('/transfer', async (req, res) => {
+    console.log('============= TRANSFER ROUTE HIT ============');
+    console.log('Request body:', req.body);
+
+    const { sender_account, receiver_account, amount, password } = req.body;
+
+    // Validate all fields
+    if (!sender_account || !receiver_account || !amount || !password) {
+        req.flash('errorMessage', 'Please fill in all fields');
+        return res.redirect('/transfer');
+    }
+
+    // Prevent self-transfer
+    if (sender_account === receiver_account) {
+        req.flash('errorMessage', 'You cannot transfer to your own account');
+        return res.redirect('/transfer');
+    }
+    try {
+        // Verify sender credentials
+        const credentialsCheck  = await verifyUserCredentials(sender_account, password);
+        if (!credentialsCheck.success) {
+            req.flash('errorMessage', credentialsCheck.message);
+            return res.redirect('/transfer');
+        }
+
+        const sender = credentialsCheck.user;
+        console.log('Sender verified:', sender.username);
+
+        // Verify receiver account exist
+        const receiverCheck = await verifyAccountExists(receiver_account);
+        if (!receiverCheck.success) {
+            req.flash('errorMessage', receiverCheck.message);
+            return res.redirect('/transfer');
+        }
+
+        const receiver = receiverCheck.user;
+        console.log('Receiver found:', receiver.username);
+
+        // Validate amount
+        const amountCheck = validateAmount(amount);
+        if (!amountCheck.valid) {
+            req.flash('errorMessage', amountCheck.message);
+            return res.redirect('/transfer');
+        }
+
+        const transferAmount = amountCheck.amount;
+
+        // Check if sender has sufficient balance
+        const balanceCheck = await checkSufficientBalance(sender_account, transferAmount);
+        if (!balanceCheck.success) {
+            req.flash('errorMessage', balanceCheck.message);
+            return res.redirect('/transfer');
+        }
+
+        // A transaction ensures BOTH updates succeed or BOTH fail
+        // This prevents money being deducted from sender but not added to recipient
+        await pool.query('BEGIN');
+
+        try {
+            // Deduct from sender account
+            await pool.query('UPDATE balances SET balance = balance - $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2',
+                [transferAmount, sender.user_id]
+            );
+
+            // Add to receiver account
+            await pool.query('UPDATE balances SET balance = balance + $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2',
+                [transferAmount, receiver.user_id]
+            );
+
+            // Commit the transaction if both succeed
+            await pool.query('COMMIT');
+            console.log('Transaction committed successfully');
+
+        } catch (transactionErr){
+            // Rollback tansaction if anything fails
+            await pool.query('ROLLBACK');
+            console.error('Transaction failed, rolled back:', transactionErr);
+            req.flash('errorMessage', 'Transfer failed. Please try again.');
+            return res.redirect('/transfer');
+        }
+
+        // Get sender's updated balance
+        const updatedBalance = await getUserBalance(sender_account);
+        const newBalance = updatedBalance.balance;
+
+        console.log('Transfer successful. Sender new balance:', newBalance);
+
+        req.flash('successMessage', 
+            `Transfer successful! GHS ${transferAmount} sent to account ${receiver_account}. 
+             Your new balance is: GHS ${newBalance}`
+        );
+        res.redirect('/transfer');
+
+    } catch (err) {
+        console.error('Error in transfer route:', err);
+        req.flash('errorMessage', 'Server Error. Please try again later.');
+        res.redirect('/transfer');
+    }
 });
 // ============= TRANSFER ROUTE ENDS ============ //
 
