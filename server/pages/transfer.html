@@ -85,15 +85,25 @@
                                 </div>
                             </div>
                             <div class="col-md-10 offset-md-1">
-                                <form id="request" class="register_form">
-                                    <!-- <h2>Personal Details</h2> -->
+                                <form method="POST" action="/transfer" class="register_form">
                                     <hr>
+                                    <% if (typeof successMessage !== 'undefined' && successMessage.length > 0) { %>
+                                        <div class="alert alert-success" style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px;">
+                                            <%= successMessage %>
+                                        </div>
+                                    <% } %>
+                                    <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+                                        <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px;">
+                                            <%= errorMessage %>
+                                        </div>
+                                    <% } %>
+                                    <!-- <h2>Personal Details</h2> -->
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <input class="new_user" placeholder="Sender Account Number" type="text" id="account_number" name="account_number" required>
+                                            <input class="new_user" placeholder="Sender Account Number" type="text" id="sender_account" name="sender_account" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <input class="new_user" placeholder="Reciever Account Number" type="text" id="account_number" name="account_number" required>
+                                            <input class="new_user" placeholder="Reciever Account Number" type="text" id="receiver_account" name="receiver_account" required>
                                         </div>
                                         <div class="col-md-6">
                                             <input class="new_user" placeholder="Amount" name="amount" required>
