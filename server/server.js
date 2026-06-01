@@ -550,7 +550,7 @@ app.get('/close_account', requireLogin, (req, res) => {
 });
 // ============= CLOSE ACCOUNT ROUTE ENDS ============ //
 
-
+// ============= LOGOUT ROUTE ============ //
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
@@ -561,6 +561,7 @@ app.get('/logout', (req, res) => {
         res.redirect('/login');
     });
 });
+// ============= LOGOUT ROUTE ENDS ============ //
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
