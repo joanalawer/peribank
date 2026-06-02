@@ -157,12 +157,10 @@ app.post('/register', async (req, res) => {
 
 
 // ============= LOGIN ROUTE ============
-// ============= Login GET route ============
 app.get('/login', (req, res) => {
     res.render('login');
 });
 
-// ============= Login POST route ============
 app.post('/login', async (req, res) => {
     const { account_number, password } = req.body;
 
@@ -243,7 +241,6 @@ app.get('/profile', (req, res) => {
 
 
 // ============= DEPOSIT ROUTE ============ //
-// Deposit GET routes
 app.get('/deposit', requireLogin, (req, res) => {
     res.render('deposit', {
         successMessage: req.flash('successMessage'),
@@ -251,7 +248,6 @@ app.get('/deposit', requireLogin, (req, res) => {
     });
 });
 
-// Deposit POST route
 app.post('/deposit', async (req, res) => {
     console.log('============ DEPOSIT ROUTE HIT ============');
     
@@ -316,7 +312,6 @@ app.post('/deposit', async (req, res) => {
 
 
 // ============= WITHDRAW ROUTE ============ //
-// Withdraw GET routes
 app.get('/withdraw', requireLogin, (req, res) => {
     res.render('withdraw', {
         successMessage: req.flash('successMessage'),
@@ -324,7 +319,6 @@ app.get('/withdraw', requireLogin, (req, res) => {
     });
 });
 
-// Withdraw POST route
 app.post('/withdraw', async (req, res) => {
     console.log('============= WITHDRAW ROUTE HIT ============');
 
@@ -380,8 +374,7 @@ app.post('/withdraw', async (req, res) => {
 // ============= WITHDRAW ROUTE ENDS ============ //
 
 
-// ============= BALANCE ROUTE ENDS ============ //
-// Balance route
+// ============= BALANCE ROUTE ============ //
 app.get('/balance', requireLogin, (req, res) => {
     res.render('balance', {
         successMessage: req.flash('successMessage'),
@@ -436,7 +429,6 @@ app.post('/balance', async (req, res) => {
 // ============= BALANCE ROUTE ENDS ============ //
 
 // ============= TRANSFER ROUTE ============ //
-// Teansfer GET route
 app.get('/transfer', requireLogin, (req, res) => {
     res.render('transfer');
 });
@@ -544,7 +536,6 @@ app.post('/transfer', async (req, res) => {
 
 
 // ============= CLOSE ACCOUNT ROUTE ============ //
-// Close Account GET route
 app.get('/close_account', requireLogin, (req, res) => {
     res.render('close_account');
 });
