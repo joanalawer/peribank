@@ -85,7 +85,13 @@
                                  </div>
                              </div>
                              <div class="col-md-10 offset-md-1">
-                                 <form id="request" class="register_form">
+                                 <!-- Error Messages -->
+                                 <% if (errorMessage) { %>
+                                    <div class="error-list">
+                                         <% errorMessage %>
+                                    </div>
+                                 <% } %>
+                                 <form action="/close_account" method="POST" id="request" class="register_form">
                                      <!-- <h2>Personal Details</h2> -->
                                      <hr>
                                      <div class="row">
