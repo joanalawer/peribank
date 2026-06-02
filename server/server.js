@@ -548,6 +548,16 @@ app.post('/transfer', async (req, res) => {
 app.get('/close_account', requireLogin, (req, res) => {
     res.render('close_account');
 });
+
+app.post('/close_account', async (req, res) => {
+    const {username, account_number, user_id, password} = req.body;
+    
+    // Validate all fields
+    if (!username || !account_number || !user_id || !password) {
+        req.flash('errorMessage', 'Please fill in all fields');
+        return res.redirect('/close_account');
+    }
+})
 // ============= CLOSE ACCOUNT ROUTE ENDS ============ //
 
 // ============= LOGOUT ROUTE ============ //
