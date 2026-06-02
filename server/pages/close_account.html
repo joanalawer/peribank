@@ -86,10 +86,10 @@
                              </div>
                              <div class="col-md-10 offset-md-1">
                                  <!-- Error Messages -->
-                                 <% if (errorMessage) { %>
-                                    <div class="error-list">
-                                         <% errorMessage %>
-                                    </div>
+                                 <% if (typeof errorMessage !== 'undefined' && errorMessage.length > 0) { %>
+                                     <div class="alert alert-danger" style="padding: 15px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px;">
+                                         <%= errorMessage %>
+                                     </div>
                                  <% } %>
                                  <form action="/close_account" method="POST" id="request" class="register_form">
                                      <!-- <h2>Personal Details</h2> -->
